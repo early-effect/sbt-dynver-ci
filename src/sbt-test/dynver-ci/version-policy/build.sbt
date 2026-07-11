@@ -1,3 +1,5 @@
+scalaVersion := "3.8.4"
+
 val assertOnTag = taskKey[Unit]("assert version is the clean tag")
 val assertAfterTag = taskKey[Unit]("assert version is tag-ci")
 

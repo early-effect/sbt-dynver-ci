@@ -7,11 +7,10 @@ import sbtdynver.DynVerPlugin.autoImport.*
 
 /** Cache-friendly dynver policy for early-effect builds.
   *
-  * On a clean version tag (`v0.2.0`): version is `0.2.0` (publish).
-  * Otherwise: version is `<last-tag>-ci` (e.g. `0.2.0-ci`), so jar names and
-  * sbt 2 action-cache digests stay stable across commits until the next tag.
+  * On a clean version tag (`v0.2.0`): version is `0.2.0` (publish). Otherwise: version is `<last-tag>-ci` (e.g.
+  * `0.2.0-ci`), so jar names and sbt 2 action-cache digests stay stable across commits until the next tag.
   *
-  * Requires [[DynVerPlugin]]. Depends on sbt-dynver transitively; consumers only need:
+  * Requires DynVerPlugin. Depends on sbt-dynver transitively; consumers only need:
   * {{{
   * addSbtPlugin("rocks.earlyeffect" % "sbt-dynver-ci" % "<version>")
   * }}}
@@ -36,16 +35,18 @@ object DynverCiPlugin extends AutoPlugin:
       val suffix = dynverCiSuffix.value
       dynverGitDescribeOutput.value.mkVersion(
         DynverCiVersion.format(_, suffix),
-        DynverCiVersion.fallback(suffix),
+        DynverCiVersion.fallback(suffix)
       )
     },
     dynver := {
       val suffix = dynverCiSuffix.value
       val d = new java.util.Date
-      sbtdynver.DynVer.getGitDescribeOutput(d).mkVersion(
-        DynverCiVersion.format(_, suffix),
-        DynverCiVersion.fallback(suffix),
-      )
-    },
+      sbtdynver.DynVer
+        .getGitDescribeOutput(d)
+        .mkVersion(
+          DynverCiVersion.format(_, suffix),
+          DynverCiVersion.fallback(suffix)
+        )
+    }
   )
 end DynverCiPlugin
