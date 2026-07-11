@@ -1,0 +1,16 @@
+# Scripted smoke test: clean tag -> 0.2.0; commit after tag -> 0.2.0-ci
+$ git init
+$ git config user.email "ci@example.com"
+$ git config user.name "CI"
+$ git config commit.gpgsign false
+$ echo 'readme' > README.md
+$ git add README.md build.sbt project
+$ git commit -m "init"
+$ git tag v0.2.0
+> reload
+> assertOnTag
+$ echo 'more' >> README.md
+$ git add README.md
+$ git commit -m "after tag"
+> reload
+> assertAfterTag
