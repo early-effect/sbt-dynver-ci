@@ -1,4 +1,5 @@
-val scala3Version = "3.8.4"
+val scala3Version   = "3.8.4"
+val specularVersion = "0.3.0"
 
 ThisBuild / scalaVersion         := scala3Version
 ThisBuild / organization         := "rocks.earlyeffect"
@@ -37,6 +38,7 @@ usePgpKeyHex(sys.env.getOrElse("PGP_KEY_HEX", "MISSING_KEY_HEX"))
 lazy val root = project
   .in(file("."))
   .enablePlugins(SbtPlugin)
+  .aggregate(docs)
   .settings(
     name := "sbt-dynver-ci",
     scalacOptions ++= Seq("-deprecation", "-feature", "-Wunused:all"),
@@ -47,6 +49,26 @@ lazy val root = project
     scriptedBufferLog := false,
     publishMavenStyle := true,
     pomIncludeRepository := { _ => false },
+  )
+
+lazy val docs = project
+  .in(file("docs"))
+  .enablePlugins(SpecularPlugin)
+  .settings(
+    name        := "sbt-dynver-ci-docs",
+    description := "Cache-friendly sbt-dynver policy for CI; docs site",
+    publish / skip := true,
+    scalacOptions ++= Seq("-deprecation", "-feature", "-Wunused:all"),
+    libraryDependencies ++= Seq(
+      "rocks.earlyeffect" %% "specular-core"           % specularVersion,
+      "rocks.earlyeffect" %% "specular-zio-test"       % specularVersion,
+      "rocks.earlyeffect" %% "specular-site"           % specularVersion,
+      "rocks.earlyeffect" %% "early-effect-docs-theme" % specularVersion,
+    ),
+    Compile / mainClass   := Some("rocks.earlyeffect.sbt.dynverci.docs.ServeSite"),
+    run / mainClass       := Some("rocks.earlyeffect.sbt.dynverci.docs.ServeSite"),
+    specularBuildMain     := "rocks.earlyeffect.sbt.dynverci.docs.BuildSite",
+    specularSiteDirectory := (ThisBuild / baseDirectory).value / "target" / "site",
   )
 
 addCommandAlias("release", "; publishSigned; sonaRelease")

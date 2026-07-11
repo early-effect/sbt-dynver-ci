@@ -2,6 +2,8 @@
 
 Cache-friendly [sbt-dynver](https://github.com/sbt/sbt-dynver) policy for early-effect builds.
 
+Docs: [early-effect.github.io/sbt-dynver-ci](https://early-effect.github.io/sbt-dynver-ci/) (after first `v*` Docs deploy).
+
 | Git state | Version |
 | --- | --- |
 | Clean on tag `v0.2.0` | `0.2.0` |
