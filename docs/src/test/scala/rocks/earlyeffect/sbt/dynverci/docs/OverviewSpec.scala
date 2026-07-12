@@ -7,4 +7,3 @@ import zio.test.*
 object OverviewSpec extends ZIOSpecDefault:
   def spec =
     DocTestInterpreter.specOf(Overview).provideLayer(ExampleRunner.live)
-end OverviewSpec

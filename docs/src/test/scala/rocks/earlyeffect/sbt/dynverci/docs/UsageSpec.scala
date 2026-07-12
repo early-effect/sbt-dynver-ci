@@ -7,4 +7,3 @@ import zio.test.*
 object UsageSpec extends ZIOSpecDefault:
   def spec =
     DocTestInterpreter.specOf(Usage).provideLayer(ExampleRunner.live)
-end UsageSpec

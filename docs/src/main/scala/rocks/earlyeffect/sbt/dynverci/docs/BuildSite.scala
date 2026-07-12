@@ -11,7 +11,7 @@ import java.nio.file.{Path, Paths}
 object BuildSite extends ZIOAppDefault:
 
   def run =
-    val out = SitePaths.outDir(repoRoot.resolve("target/site"))
+    val out  = SitePaths.outDir(repoRoot.resolve("target/site"))
     val base = SitePaths.basePath(".")
     val meta = ProjectMeta.fromSystemProperties
       .map(m =>
@@ -23,7 +23,7 @@ object BuildSite extends ZIOAppDefault:
               "Cache-friendly sbt-dynver policy for CI: stable jar names between tags."
             )
           ),
-          language = Some("Scala")
+          language = Some("Scala"),
         )
       )
       .orElse(
@@ -37,13 +37,13 @@ object BuildSite extends ZIOAppDefault:
             description = Some(
               "Cache-friendly sbt-dynver policy for CI: stable jar names between tags."
             ),
-            language = Some("Scala")
+            language = Some("Scala"),
           )
         )
       )
     val version = meta.map(_.version).getOrElse("0.1.0-SNAPSHOT")
-    val org = meta.map(_.organization).getOrElse("rocks.earlyeffect")
-    val model = SiteModel(
+    val org     = meta.map(_.organization).getOrElse("rocks.earlyeffect")
+    val model   = SiteModel(
       title = "sbt-dynver-ci",
       basePath = base,
       pages = Vector(Overview.doc, Usage.doc),
@@ -54,7 +54,7 @@ object BuildSite extends ZIOAppDefault:
       logoLink = Some("https://www.earlyeffect.rocks/"),
       summaryMarkdown = Some(
         s"""**sbt-dynver-ci** is a thin sbt-dynver policy for early-effect CI builds.
-On a clean version tag the version is the release (`0.2.0`). Otherwise it is
+On a clean version tag the version is the release itself (`0.2.0`). Everywhere else it is
 `<last-tag>-ci`, so jar names and sbt 2 action-cache digests stay stable across commits
 until the next tag.
 """
@@ -63,13 +63,13 @@ until the next tag.
         CodeSnippet(
           "Install",
           s"""// project/plugins.sbt
-addSbtPlugin("$org" % "sbt-dynver-ci" % "$version")"""
+addSbtPlugin("$org" % "sbt-dynver-ci" % "$version")""",
         ),
         CodeSnippet(
           "Optional suffix",
-          """ThisBuild / dynverCiSuffix := "-SNAPSHOT" // default is "-ci""""
-        )
-      )
+          """ThisBuild / dynverCiSuffix := "-SNAPSHOT" // default is "-ci"""",
+        ),
+      ),
     )
     ZIO
       .serviceWithZIO[SiteBuilder](_.buildSite(model, out))
@@ -86,7 +86,7 @@ addSbtPlugin("$org" % "sbt-dynver-ci" % "$version")"""
         EarlyEffectTheme.live,
         PageTemplate.live,
         LandingTemplate.live,
-        SiteBuilder.live
+        SiteBuilder.live,
       )
   end run
 
