@@ -32,6 +32,7 @@ until the next tag.
       logo = Some(EarlyEffectTheme.logoHref),
       logoLink = Some("https://www.earlyeffect.rocks/"),
     )
+  end site
 
   override def layers: ZLayer[Any, Nothing, SiteBuilder] =
     ZLayer.make[SiteBuilder](
