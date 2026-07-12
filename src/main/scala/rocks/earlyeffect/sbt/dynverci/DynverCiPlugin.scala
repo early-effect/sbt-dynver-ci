@@ -21,11 +21,10 @@ object DynverCiPlugin extends AutoPlugin:
     val dynverCiSuffix = settingKey[String](
       "Suffix appended when not cleanly on a version tag (default: \"-ci\")"
     )
-  end autoImport
 
   import autoImport.*
 
-  override def requires: Plugins = DynVerPlugin
+  override def requires: Plugins      = DynVerPlugin
   override def trigger: PluginTrigger = allRequirements
 
   override def buildSettings: Seq[Setting[?]] = Seq(
@@ -35,18 +34,18 @@ object DynverCiPlugin extends AutoPlugin:
       val suffix = dynverCiSuffix.value
       dynverGitDescribeOutput.value.mkVersion(
         DynverCiVersion.format(_, suffix),
-        DynverCiVersion.fallback(suffix)
+        DynverCiVersion.fallback(suffix),
       )
     },
     dynver := {
       val suffix = dynverCiSuffix.value
-      val d = new java.util.Date
+      val d      = new java.util.Date
       sbtdynver.DynVer
         .getGitDescribeOutput(d)
         .mkVersion(
           DynverCiVersion.format(_, suffix),
-          DynverCiVersion.fallback(suffix)
+          DynverCiVersion.fallback(suffix),
         )
-    }
+    },
   )
 end DynverCiPlugin

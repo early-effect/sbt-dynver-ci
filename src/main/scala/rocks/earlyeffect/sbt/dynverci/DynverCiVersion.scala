@@ -9,7 +9,7 @@ import sbtdynver.GitDescribeOutput
 object DynverCiVersion:
 
   val DefaultSuffix = "-ci"
-  val FallbackBase = "0.0.0"
+  val FallbackBase  = "0.0.0"
 
   /** Format from dynver's structured git describe output. */
   def format(out: GitDescribeOutput, suffix: String = DefaultSuffix): String =

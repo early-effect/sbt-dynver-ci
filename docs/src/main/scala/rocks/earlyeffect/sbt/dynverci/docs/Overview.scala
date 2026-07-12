@@ -22,14 +22,13 @@ like a miss.
     ),
     section("The policy")(
       md"""
-| Git state | Version |
-| --- | --- |
-| Clean on tag `v0.2.0` | `0.2.0` |
-| Any commit after that tag | `0.2.0-ci` |
-| No tags | `0.0.0-ci` |
+On a clean checkout of a version tag such as `v0.2.0`, the version is the release itself:
+`0.2.0`. Anywhere else after that tag, including dirty trees and commits that are not the
+tag tip, the version is the last release with a fixed suffix: `0.2.0-ci`. If the repository
+has no tags yet, the version is `0.0.0-ci`.
 
-Between tags, jar names stay fixed. Cutting the next tag starts a new cache generation on
-purpose.
+Between tags, jar names stay fixed, so action-cache digests can match across CI pushes.
+Cutting the next tag starts a new cache generation on purpose.
 """,
       exampleValue {
         def format(isCleanAfterTag: Boolean, version: String, suffix: String): String =
@@ -38,11 +37,11 @@ purpose.
         (
           format(true, "0.2.0", "-ci"),
           format(false, "0.2.0", "-ci"),
-          format(false, "0.0.0", "-ci")
+          format(false, "0.0.0", "-ci"),
         )
-      }.assert { case (release, ci, untaged) =>
-        assertTrue(release == "0.2.0", ci == "0.2.0-ci", untaged == "0.0.0-ci")
-      }
-    )
+      }.assert { case (release, ci, untagged) =>
+        assertTrue(release == "0.2.0", ci == "0.2.0-ci", untagged == "0.0.0-ci")
+      },
+    ),
   )
 end Overview
