@@ -1,10 +1,11 @@
 package rocks.earlyeffect.sbt.dynverci.docs
 
 import specular.*
+import specular.ziotest.DocSpecSuite
 import zio.test.*
 
 /** Why a stable CI version matters for sbt 2 action cache. */
-object Overview extends DocSpec:
+object Overview extends DocSpecSuite:
 
   def doc = page("Overview")(
     md"""

@@ -1,9 +1,10 @@
 package rocks.earlyeffect.sbt.dynverci.docs
 
 import specular.*
+import specular.ziotest.DocSpecSuite
 
 /** Install and configure sbt-dynver-ci. */
-object Usage extends DocSpec:
+object Usage extends DocSpecSuite:
 
   def doc = page("Usage")(
     md"""

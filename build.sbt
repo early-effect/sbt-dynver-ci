@@ -1,5 +1,5 @@
 val scala3Version   = "3.8.4"
-val specularVersion = "0.3.0"
+val specularVersion = "0.4.0"
 
 ThisBuild / scalaVersion         := scala3Version
 ThisBuild / organization         := "rocks.earlyeffect"
@@ -41,6 +41,8 @@ lazy val root = project
   .aggregate(docs)
   .settings(
     name := "sbt-dynver-ci",
+    description :=
+      "Cache-friendly sbt-dynver policy for CI: stable jar names between tags.",
     scalacOptions ++= Seq("-deprecation", "-feature", "-Wunused:all"),
     // Pull sbt-dynver transitively so consumers need one addSbtPlugin line.
     addSbtPlugin("com.github.sbt" % "sbt-dynver" % "5.1.1"),
@@ -55,19 +57,21 @@ lazy val docs = project
   .in(file("docs"))
   .enablePlugins(SpecularPlugin)
   .settings(
-    name        := "sbt-dynver-ci-docs",
-    description := "Cache-friendly sbt-dynver policy for CI; docs site",
+    name           := "sbt-dynver-ci-docs",
     publish / skip := true,
     scalacOptions ++= Seq("-deprecation", "-feature", "-Wunused:all"),
     libraryDependencies ++= Seq(
-      "rocks.earlyeffect" %% "specular-core"           % specularVersion,
-      "rocks.earlyeffect" %% "specular-zio-test"       % specularVersion,
-      "rocks.earlyeffect" %% "specular-site"           % specularVersion,
-      "rocks.earlyeffect" %% "early-effect-docs-theme" % specularVersion,
+      "rocks.earlyeffect" %% "specular-core"           % specularVersion % Test,
+      "rocks.earlyeffect" %% "specular-zio-test"       % specularVersion % Test,
+      "rocks.earlyeffect" %% "specular-site"           % specularVersion % Test,
+      "rocks.earlyeffect" %% "early-effect-docs-theme" % specularVersion % Test,
+      "dev.zio"           %% "zio-test"                % "2.1.26"        % Test,
+      "dev.zio"           %% "zio-test-sbt"            % "2.1.26"        % Test,
     ),
-    Compile / mainClass   := Some("rocks.earlyeffect.sbt.dynverci.docs.ServeSite"),
-    run / mainClass       := Some("rocks.earlyeffect.sbt.dynverci.docs.ServeSite"),
+    Test / mainClass      := Some("specular.site.DocsServe"),
     specularBuildMain     := "rocks.earlyeffect.sbt.dynverci.docs.BuildSite",
+    specularMetaProject   := Some(LocalProject("root")),
+    specularArtifactKind  := "plugin",
     specularSiteDirectory := (ThisBuild / baseDirectory).value / "target" / "site",
   )
 
