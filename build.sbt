@@ -5,8 +5,26 @@ ThisBuild / scalaVersion         := scala3Version
 ThisBuild / organization         := "rocks.earlyeffect"
 ThisBuild / organizationName     := "Early Effect"
 ThisBuild / organizationHomepage := Some(url("https://www.earlyeffect.rocks"))
-ThisBuild / versionScheme        := Some("early-semver")
-// This plugin's own version uses stock sbt-dynver (tag v0.1.0 -> 0.1.0).
+ThisBuild / versionScheme := Some("early-semver")
+
+// Mirror DynverCiPlugin here (stock dynver only in project/). Do not addSbtPlugin this
+// artifact: the meta-build must not depend on a previously published version of itself.
+ThisBuild / version := {
+  val suffix = "-ci"
+  sbtdynver.DynVerPlugin.autoImport.dynverGitDescribeOutput.value.mkVersion(
+    out => if out.isCleanAfterTag then out.ref.dropPrefix else out.ref.dropPrefix + suffix,
+    "0.0.0" + suffix,
+  )
+}
+ThisBuild / dynver := {
+  val suffix = "-ci"
+  sbtdynver.DynVer
+    .getGitDescribeOutput(new java.util.Date)
+    .mkVersion(
+      out => if out.isCleanAfterTag then out.ref.dropPrefix else out.ref.dropPrefix + suffix,
+      "0.0.0" + suffix,
+    )
+}
 
 ThisBuild / homepage := Some(url("https://github.com/early-effect/sbt-dynver-ci"))
 ThisBuild / licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
