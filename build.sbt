@@ -1,5 +1,5 @@
 val scala3Version   = "3.8.4"
-val specularVersion = "0.6.2"
+val specularVersion = "0.7.1"
 
 ThisBuild / scalaVersion         := scala3Version
 ThisBuild / organization         := "rocks.earlyeffect"
