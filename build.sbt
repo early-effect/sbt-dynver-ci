@@ -1,11 +1,11 @@
 val scala3Version   = "3.8.4"
 val specularVersion = "0.7.1"
 
-ThisBuild / scalaVersion         := scala3Version
-ThisBuild / organization         := "rocks.earlyeffect"
-ThisBuild / organizationName     := "Early Effect"
-ThisBuild / organizationHomepage := Some(url("https://www.earlyeffect.rocks"))
-ThisBuild / versionScheme := Some("early-semver")
+scalaVersion         := scala3Version
+organization         := "rocks.earlyeffect"
+organizationName     := "Early Effect"
+organizationHomepage := Some(url("https://www.earlyeffect.rocks"))
+versionScheme        := Some("early-semver")
 
 // Mirror DynverCiPlugin here (stock dynver only in project/). Do not addSbtPlugin this
 // artifact: the meta-build must not depend on a previously published version of itself.
@@ -26,15 +26,15 @@ dynver := {
     )
 }
 
-ThisBuild / homepage := Some(url("https://github.com/early-effect/sbt-dynver-ci"))
-ThisBuild / licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
-ThisBuild / scmInfo  := Some(
+homepage := Some(url("https://github.com/early-effect/sbt-dynver-ci"))
+licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+scmInfo  := Some(
   ScmInfo(
     url("https://github.com/early-effect/sbt-dynver-ci"),
     "scm:git@github.com:early-effect/sbt-dynver-ci.git",
   )
 )
-ThisBuild / developers := List(
+developers := List(
   Developer(
     id = "russwyte",
     name = "Russ White",
@@ -44,7 +44,7 @@ ThisBuild / developers := List(
 )
 
 // Sonatype Central Portal. sbt 2 has localStaging / publishSigned / sonaRelease.
-ThisBuild / publishTo := {
+publishTo := {
   val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
   if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
   else localStaging.value
@@ -103,7 +103,7 @@ lazy val docs = project
     specularBuildMain     := "rocks.earlyeffect.sbt.dynverci.docs.BuildSite",
     specularMetaProject   := Some(LocalProject("root")),
     specularArtifactKind  := "plugin",
-    specularSiteDirectory := (ThisBuild / baseDirectory).value / "target" / "site",
+    specularSiteDirectory := (LocalRootProject / baseDirectory).value / "target" / "site",
   )
 
 addCommandAlias("release", "; publishSigned; sonaRelease")

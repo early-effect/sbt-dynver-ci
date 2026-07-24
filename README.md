@@ -24,7 +24,7 @@ Do **not** set `version` in `build.sbt`. sbt-dynver is pulled in transitively.
 Optional:
 
 ```scala
-ThisBuild / dynverCiSuffix := "-SNAPSHOT" // default is "-ci"
+dynverCiSuffix := "-SNAPSHOT" // default is "-ci"
 ```
 
 ## Release this plugin
