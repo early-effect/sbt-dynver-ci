@@ -1,5 +1,5 @@
 val scala3Version   = "3.8.4"
-val specularVersion = "0.4.0"
+val specularVersion = "0.6.2"
 
 ThisBuild / scalaVersion         := scala3Version
 ThisBuild / organization         := "rocks.earlyeffect"
@@ -34,6 +34,19 @@ ThisBuild / publishTo := {
 
 // CI-only publishing: key hex from PGP_KEY_HEX (org secret). Sentinel keeps local loads working.
 usePgpKeyHex(sys.env.getOrElse("PGP_KEY_HEX", "MISSING_KEY_HEX"))
+
+// zipx: Aggregate verify (test + scripted) + Central publish + Specular Pages + Steward.
+zipxJavaVersion      := "25"
+zipxWorkflowDispatch := true
+zipxScalaSteward     := true
+zipxCapabilities += Capability.once("fmt", "scalafmtCheckAll")
+zipxCapabilities += Capability.once(
+  name = "test",
+  command = "test; scripted",
+  needsCapabilities = List("fmt"),
+)
+zipxCapabilities += ZipxCentral.release
+zipxCapabilities += ZipxDocs.pages()
 
 lazy val root = project
   .in(file("."))

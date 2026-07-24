@@ -12,3 +12,6 @@ src/main/resources/sbt/
 .cursor/
 .vscode/
 metals.sbt
+# Metals / IDE
+*.semanticdb
+build.sbt.semanticdb
