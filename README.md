@@ -24,12 +24,14 @@ Do **not** set `version` in `build.sbt`. sbt-dynver is pulled in transitively.
 Optional:
 
 ```scala
-ThisBuild / dynverCiSuffix := "-SNAPSHOT" // default is "-ci"
+dynverCiSuffix := "-SNAPSHOT" // default is "-ci"
 ```
 
 ## Release this plugin
 
-Stock dynver versions this repo from tags. Push `v0.1.0` to publish via the Release workflow (CI-only signing).
+The meta-build uses stock sbt-dynver plus the same `-ci` version formula inlined in `build.sbt`
+(so we never depend on a prior published copy of this plugin). Push a `v*` tag to publish via
+the Release workflow (CI-only signing).
 
 ## License
 

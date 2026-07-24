@@ -31,7 +31,7 @@ The default CI suffix is `-ci`. Override it when you want a different marker bet
 for example `-SNAPSHOT`:
 
 ```scala
-ThisBuild / dynverCiSuffix := "-SNAPSHOT"
+dynverCiSuffix := "-SNAPSHOT"
 ```
 
 The same rule applies: a clean version tag still yields the release version; every other

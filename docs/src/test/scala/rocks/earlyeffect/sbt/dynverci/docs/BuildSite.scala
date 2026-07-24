@@ -26,7 +26,7 @@ until the next tag.
         ArtifactKind.defaultInstall(m, ArtifactKind.Plugin),
         CodeSnippet(
           "Optional suffix",
-          """ThisBuild / dynverCiSuffix := "-SNAPSHOT" // default is "-ci"""",
+          """dynverCiSuffix := "-SNAPSHOT" // default is "-ci"""",
         ),
       ),
       logo = Some(EarlyEffectTheme.logoHref),
