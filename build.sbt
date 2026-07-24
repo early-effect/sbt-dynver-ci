@@ -9,14 +9,14 @@ ThisBuild / versionScheme := Some("early-semver")
 
 // Mirror DynverCiPlugin here (stock dynver only in project/). Do not addSbtPlugin this
 // artifact: the meta-build must not depend on a previously published version of itself.
-ThisBuild / version := {
+version := {
   val suffix = "-ci"
   sbtdynver.DynVerPlugin.autoImport.dynverGitDescribeOutput.value.mkVersion(
     out => if out.isCleanAfterTag then out.ref.dropPrefix else out.ref.dropPrefix + suffix,
     "0.0.0" + suffix,
   )
 }
-ThisBuild / dynver := {
+dynver := {
   val suffix = "-ci"
   sbtdynver.DynVer
     .getGitDescribeOutput(new java.util.Date)
