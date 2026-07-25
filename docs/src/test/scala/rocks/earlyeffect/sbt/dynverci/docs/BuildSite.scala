@@ -13,8 +13,9 @@ object BuildSite extends DocsSite:
   def pages = Vector(Overview.doc, Usage.doc)
 
   override def site: SiteModel =
-    val m = meta
-    super.site.copy(
+    val m       = meta
+    val branded = EarlyEffectTheme.brand(super.site)
+    branded.copy(
       summaryMarkdown = Some(
         s"""**sbt-dynver-ci** is a thin sbt-dynver policy for early-effect CI builds.
 On a clean version tag the version is the release itself (`0.2.0`). Everywhere else it is
@@ -29,23 +30,11 @@ until the next tag.
           """dynverCiSuffix := "-SNAPSHOT" // default is "-ci"""",
         ),
       ),
-      logo = Some(EarlyEffectTheme.logoHref),
-      logoLink = Some("https://www.earlyeffect.rocks/"),
     )
   end site
 
   override def layers: ZLayer[Any, Nothing, SiteBuilder] =
-    ZLayer.make[SiteBuilder](
-      MarkdownRenderer.live,
-      ExampleRunner.live,
-      HtmlSsr.live,
-      SiteWriter.live,
-      NavBuilder.live,
-      EarlyEffectTheme.live,
-      PageTemplate.live,
-      LandingTemplate.live,
-      SiteBuilder.live,
-    )
+    EarlyEffectTheme.layers
 
   override def afterBuild(out: Path, result: SiteOutput): Task[Unit] =
     EarlyEffectTheme.writeLogo(out)
