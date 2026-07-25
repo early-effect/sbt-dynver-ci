@@ -35,17 +35,7 @@ until the next tag.
   end site
 
   override def layers: ZLayer[Any, Nothing, SiteBuilder] =
-    ZLayer.make[SiteBuilder](
-      MarkdownRenderer.live,
-      ExampleRunner.live,
-      HtmlSsr.live,
-      SiteWriter.live,
-      NavBuilder.live,
-      EarlyEffectTheme.live,
-      PageTemplate.live,
-      LandingTemplate.live,
-      SiteBuilder.live,
-    )
+    EarlyEffectTheme.layers
 
   override def afterBuild(out: Path, result: SiteOutput): Task[Unit] =
     EarlyEffectTheme.writeLogo(out)
