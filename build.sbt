@@ -7,16 +7,19 @@ organizationName     := "Early Effect"
 organizationHomepage := Some(url("https://www.earlyeffect.rocks"))
 versionScheme        := Some("early-semver")
 
-// Mirror DynverCiPlugin here (stock dynver only in project/). Do not addSbtPlugin this
-// artifact: the meta-build must not depend on a previously published version of itself.
-version := {
+// Mirror DynverCiPlugin.buildSettings here (stock dynver only in project/). Do not addSbtPlugin
+// this artifact: the meta-build must not depend on a previously published version of itself.
+// Must be ThisBuild-scoped: DynVerPlugin sets ThisBuild / version; a bare `version :=` only
+// overrides the root project and leaves stock dynver (e.g. 0.2.2+3-hash) on ThisBuild — which
+// breaks specularDisplayVersion (and anything else that reads ThisBuild / version).
+ThisBuild / version := {
   val suffix = "-ci"
   sbtdynver.DynVerPlugin.autoImport.dynverGitDescribeOutput.value.mkVersion(
     out => if out.isCleanAfterTag then out.ref.dropPrefix else out.ref.dropPrefix + suffix,
     "0.0.0" + suffix,
   )
 }
-dynver := {
+ThisBuild / dynver := {
   val suffix = "-ci"
   sbtdynver.DynVer
     .getGitDescribeOutput(new java.util.Date)
