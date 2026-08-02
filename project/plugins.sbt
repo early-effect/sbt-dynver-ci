@@ -3,4 +3,3 @@ addSbtPlugin("com.github.sbt"    % "sbt-dynver"   % "5.1.1")
 addSbtPlugin("com.github.sbt"    % "sbt-pgp"      % "2.3.1")
 addSbtPlugin("rocks.earlyeffect" % "sbt-specular" % "0.10.1")
 addSbtPlugin("rocks.earlyeffect" % "sbt-zipx"     % "0.1.0")
-
