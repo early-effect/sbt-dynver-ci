@@ -1,5 +1,5 @@
 val scala3Version   = "3.8.4"
-val specularVersion = "0.10.1"
+val specularVersion = "0.11.0"
 
 scalaVersion         := scala3Version
 organization         := "rocks.earlyeffect"
@@ -80,7 +80,7 @@ lazy val root = project
     scalacOptions ++= Seq("-deprecation", "-feature", "-Wunused:all"),
     // Pull sbt-dynver transitively so consumers need one addSbtPlugin line.
     addSbtPlugin("com.github.sbt" % "sbt-dynver" % "5.1.1"),
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % Test,
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.20" % Test,
     scriptedLaunchOpts ++= Seq("-Xmx512m", s"-Dplugin.version=${version.value}"),
     scriptedBufferLog := false,
     publishMavenStyle := true,
