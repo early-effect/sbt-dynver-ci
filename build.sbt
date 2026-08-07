@@ -57,14 +57,19 @@ publishTo := {
 usePgpKeyHex(sys.env.getOrElse("PGP_KEY_HEX", "MISSING_KEY_HEX"))
 
 // zipx: Aggregate verify (test + scripted) + Central publish + Specular Pages + Steward.
-zipxJavaVersion      := "25"
+val Fmt = CapabilityName("fmt")
+
+// Compound, so it stays a literal SbtCommand rather than a spliced task key.
+val ciVerify: SbtCommand = SbtCommand("test; scripted")
+
+zipxJavaVersion      := JdkVersion("25")
 zipxWorkflowDispatch := true
 zipxScalaSteward     := true
-zipxCapabilities += Capability.once("fmt", "scalafmtCheckAll")
+zipxCapabilities += zipxTasks.once(Fmt, scalafmtCheckAll)
 zipxCapabilities += Capability.once(
-  name = "test",
-  command = "test; scripted",
-  needsCapabilities = List("fmt"),
+  name = Capability.TestName,
+  command = ciVerify,
+  needsCapabilities = List(Fmt),
 )
 zipxCapabilities += ZipxCentral.release
 zipxCapabilities += ZipxDocs.pages()
