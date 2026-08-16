@@ -1,7 +1,5 @@
-val scala3Version   = "3.8.4"
-val specularVersion = "0.12.0"
+MyVersions.settings
 
-scalaVersion         := scala3Version
 organization         := "rocks.earlyeffect"
 organizationName     := "Early Effect"
 organizationHomepage := Some(url("https://www.earlyeffect.rocks"))
@@ -56,36 +54,26 @@ publishTo := {
 // CI-only publishing: key hex from PGP_KEY_HEX (org secret). Sentinel keeps local loads working.
 usePgpKeyHex(sys.env.getOrElse("PGP_KEY_HEX", "MISSING_KEY_HEX"))
 
-// zipx: Aggregate verify (test + scripted) + Central publish + Specular Pages + Steward.
-val Fmt = CapabilityName("fmt")
-
-// Compound, so it stays a literal SbtCommand rather than a spliced task key.
-val ciVerify: SbtCommand = SbtCommand("test; scripted")
-
+// zipx: Aggregate verify (testFull + scripted) + Central publish + Specular Pages + catalog PRs.
+// Builtin fmt / workflow-check / advisories stay parallel; do not make test wait on fmt.
 zipxJavaVersion      := JdkVersion("25")
 zipxWorkflowDispatch := true
-zipxScalaSteward     := true
-zipxCapabilities += zipxTasks.once(Fmt, scalafmtCheckAll)
-zipxCapabilities += Capability.once(
-  name = Capability.TestName,
-  command = ciVerify,
-  needsCapabilities = List(Fmt),
-)
-zipxCapabilities += ZipxCentral.release
+zipxTestTask         := zipxTasks.session(testFull, scripted)
+zipxCapabilities += ZipxCentral.releaseRoot
 zipxCapabilities += ZipxDocs.pages()
 
 lazy val root = project
   .in(file("."))
   .enablePlugins(SbtPlugin)
   .aggregate(docs)
+  .settings(MyVersions.pluginTest)
   .settings(
     name := "sbt-dynver-ci",
     description :=
       "Cache-friendly sbt-dynver policy for CI: stable jar names between tags.",
     scalacOptions ++= Seq("-deprecation", "-feature", "-Wunused:all"),
     // Pull sbt-dynver transitively so consumers need one addSbtPlugin line.
-    addSbtPlugin("com.github.sbt" % "sbt-dynver" % "5.1.1"),
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.20" % Test,
+    addSbtPlugin(MyVersions.moduleID(MyVersions.dynver)),
     scriptedLaunchOpts ++= Seq("-Xmx512m", s"-Dplugin.version=${version.value}"),
     scriptedBufferLog := false,
     publishMavenStyle := true,
@@ -95,18 +83,11 @@ lazy val root = project
 lazy val docs = project
   .in(file("docs"))
   .enablePlugins(SpecularPlugin)
+  .settings(MyVersions.docsTest)
   .settings(
     name           := "sbt-dynver-ci-docs",
     publish / skip := true,
     scalacOptions ++= Seq("-deprecation", "-feature", "-Wunused:all"),
-    libraryDependencies ++= Seq(
-      "rocks.earlyeffect" %% "specular-core"           % specularVersion % Test,
-      "rocks.earlyeffect" %% "specular-zio-test"       % specularVersion % Test,
-      "rocks.earlyeffect" %% "specular-site"           % specularVersion % Test,
-      "rocks.earlyeffect" %% "early-effect-docs-theme" % specularVersion % Test,
-      "dev.zio"           %% "zio-test"                % "2.1.26"        % Test,
-      "dev.zio"           %% "zio-test-sbt"            % "2.1.26"        % Test,
-    ),
     Test / mainClass      := Some("specular.site.DocsServe"),
     specularBuildMain     := "rocks.earlyeffect.sbt.dynverci.docs.BuildSite",
     specularMetaProject   := Some(LocalProject("root")),
