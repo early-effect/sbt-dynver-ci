@@ -10,8 +10,8 @@ import sbtdynver.DynVerPlugin.autoImport.dynver
   * On a clean version tag (`v0.2.0`): version is `0.2.0` (publish). Otherwise: version is `<last-tag>-ci` (e.g.
   * `0.2.0-ci`), so jar names and sbt 2 action-cache digests stay stable across commits until the next tag.
   *
-  * Same formula as before, but `version` / `dynver` call live `DynVer.getGitDescribeOutput` under `Def.uncached` so a
-  * restored previous-tag LocalDir cache cannot republish that tag. "On the tag" is sbt-dynver's `isCleanAfterTag`.
+  * Git state comes from sbt-dynver (`DynVer.getGitDescribeOutput` / `isCleanAfterTag`). This plugin only appends the
+  * suffix. `version` / `dynver` are `Def.uncached` so a restored LocalDir cache cannot republish the last tag.
   *
   * Requires DynVerPlugin. Depends on sbt-dynver transitively; consumers only need:
   * {{{
@@ -32,7 +32,13 @@ object DynverCiPlugin extends AutoPlugin:
 
   override def buildSettings: Seq[Setting[?]] = Seq(
     dynverCiSuffix := DynverCiVersion.DefaultSuffix,
-    version        := Def.uncached(DynverCiVersion.fromGit(dynverCiSuffix.value)),
-    dynver         := Def.uncached(DynverCiVersion.fromGit(dynverCiSuffix.value)),
+    version        := Def.uncached(ciVersion(dynverCiSuffix.value)),
+    dynver         := Def.uncached(ciVersion(dynverCiSuffix.value)),
   )
+
+  /** Last tagged version from sbt-dynver; append the suffix when the tree is not clean on that tag. */
+  private def ciVersion(suffix: String): String =
+    sbtdynver.DynVer
+      .getGitDescribeOutput(new java.util.Date)
+      .mkVersion(DynverCiVersion.format(_, suffix), DynverCiVersion.fallback(suffix))
 end DynverCiPlugin

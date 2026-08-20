@@ -44,10 +44,9 @@ Give dynver enough history to see tags: set `fetch-depth: 0` (or a depth that in
 latest `v*` tags). Publish releases from a clean checkout of a `v*` tag so the Release
 workflow sees the release version rather than the CI suffix.
 
-`version` is uncached and re-reads git through sbt-dynver's `getGitDescribeOutput` (the same
-call `dynver` already made). "On a tag" is dynver's `isCleanAfterTag`. When several tags
-point at that commit, the highest name wins. You do not need `cleanFull` on publish to bust
-a stale version string.
+`version` is uncached so a restored LocalDir cache cannot republish the last tag. Git state
+is still sbt-dynver's: last tagged version, plus `-ci` when `isCleanAfterTag` is false. You
+do not need `cleanFull` on publish to bust a stale version string.
 """
     ),
   )

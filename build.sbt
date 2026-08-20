@@ -12,18 +12,12 @@ versionScheme        := Some("early-semver")
 // breaks specularDisplayVersion (and anything else that reads ThisBuild / version).
 def metaCiVersion: String =
   val suffix = "-ci"
-  sbtdynver.DynVer.getGitDescribeOutput(new java.util.Date) match
-    case None => "0.0.0" + suffix
-    case Some(out) if out.isCleanAfterTag =>
-      val tags =
-        scala.util.Try(scala.sys.process.Process(Seq("git", "tag", "--points-at", "HEAD", "--list", "v*")).!!.trim)
-          .toOption
-          .toSeq
-          .flatMap(_.split('\n').map(_.trim).filter(_.nonEmpty))
-          .map(_.stripPrefix("v"))
-          .filter(_.nonEmpty)
-      (out.ref.dropPrefix +: tags).max
-    case Some(out) => out.ref.dropPrefix + suffix
+  sbtdynver.DynVer
+    .getGitDescribeOutput(new java.util.Date)
+    .mkVersion(
+      out => if out.isCleanAfterTag then out.ref.dropPrefix else out.ref.dropPrefix + suffix,
+      "0.0.0" + suffix,
+    )
 
 ThisBuild / version := Def.uncached(metaCiVersion)
 ThisBuild / dynver  := Def.uncached(metaCiVersion)

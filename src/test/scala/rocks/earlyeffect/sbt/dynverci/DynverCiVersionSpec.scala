@@ -24,9 +24,4 @@ class DynverCiVersionSpec extends AnyFunSuite:
   test("synthetic untaged base 0.0.0 becomes 0.0.0-ci") {
     assert(DynverCiVersion.format(isCleanAfterTag = false, "0.0.0", "-ci") == "0.0.0-ci")
   }
-
-  test("same-commit retag prefers the highest tag on HEAD") {
-    assert(DynverCiVersion.highestOnHead("0.0.4", Seq("v0.0.4", "v0.0.5")) == "0.0.5")
-    assert(DynverCiVersion.highestOnHead("0.9.0", Seq("v0.10.0")) == "0.10.0")
-  }
 end DynverCiVersionSpec
