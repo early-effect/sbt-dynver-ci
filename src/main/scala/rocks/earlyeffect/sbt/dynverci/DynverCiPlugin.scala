@@ -3,12 +3,15 @@ package rocks.earlyeffect.sbt.dynverci
 import sbt.*
 import sbt.Keys.*
 import sbtdynver.DynVerPlugin
-import sbtdynver.DynVerPlugin.autoImport.*
+import sbtdynver.DynVerPlugin.autoImport.dynver
 
 /** Cache-friendly dynver policy for early-effect builds.
   *
   * On a clean version tag (`v0.2.0`): version is `0.2.0` (publish). Otherwise: version is `<last-tag>-ci` (e.g.
   * `0.2.0-ci`), so jar names and sbt 2 action-cache digests stay stable across commits until the next tag.
+  *
+  * Same formula as before, but `version` / `dynver` call live `DynVer.getGitDescribeOutput` under `Def.uncached` so a
+  * restored previous-tag LocalDir cache cannot republish that tag. "On the tag" is sbt-dynver's `isCleanAfterTag`.
   *
   * Requires DynVerPlugin. Depends on sbt-dynver transitively; consumers only need:
   * {{{
@@ -29,23 +32,7 @@ object DynverCiPlugin extends AutoPlugin:
 
   override def buildSettings: Seq[Setting[?]] = Seq(
     dynverCiSuffix := DynverCiVersion.DefaultSuffix,
-    // Override DynVerPlugin's version / dynver with the cache-friendly formula.
-    version := {
-      val suffix = dynverCiSuffix.value
-      dynverGitDescribeOutput.value.mkVersion(
-        DynverCiVersion.format(_, suffix),
-        DynverCiVersion.fallback(suffix),
-      )
-    },
-    dynver := {
-      val suffix = dynverCiSuffix.value
-      val d      = new java.util.Date
-      sbtdynver.DynVer
-        .getGitDescribeOutput(d)
-        .mkVersion(
-          DynverCiVersion.format(_, suffix),
-          DynverCiVersion.fallback(suffix),
-        )
-    },
+    version        := Def.uncached(DynverCiVersion.fromGit(dynverCiSuffix.value)),
+    dynver         := Def.uncached(DynverCiVersion.fromGit(dynverCiSuffix.value)),
   )
 end DynverCiPlugin

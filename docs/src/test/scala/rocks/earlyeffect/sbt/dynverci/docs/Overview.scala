@@ -30,6 +30,11 @@ has no tags yet, the version is `0.0.0-ci`.
 
 Between tags, jar names stay fixed, so action-cache digests can match across CI pushes.
 Cutting the next tag starts a new cache generation on purpose.
+
+`version` itself is **not** a cache hit. It re-reads git on every evaluation (`Def.uncached` plus sbt-dynver's live
+`getGitDescribeOutput`), so restoring a previous tag's LocalDir / action cache cannot republish that tag. Compile
+still reuses `~/.cache/sbt` because the *string* stays `0.2.0-ci` until the next tag. "On the tag" is dynver's
+`isCleanAfterTag` (`git describe --long`: tagged, distance zero, not dirty).
 """,
       exampleValue {
         def format(isCleanAfterTag: Boolean, version: String, suffix: String): String =

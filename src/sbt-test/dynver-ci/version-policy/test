@@ -1,8 +1,12 @@
-# Scripted smoke test: clean tag -> 0.2.0; commit after tag -> 0.2.0-ci
-$ exec chmod +x setup-tag.sh after-tag.sh
+# Scripted: clean tag -> 0.2.0; same-commit retag -> 0.2.1 without cleanFull; commit after -> 0.2.1-ci
+$ exec chmod +x setup-tag.sh after-tag.sh retag-same-commit.sh
 $ exec ./setup-tag.sh
 > reload
 > assertOnTag
+> compile
+$ exec ./retag-same-commit.sh
+> reload
+> assertRetag
 $ exec ./after-tag.sh
 > reload
 > assertAfterTag
