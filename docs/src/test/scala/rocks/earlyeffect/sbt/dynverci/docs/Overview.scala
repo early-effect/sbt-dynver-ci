@@ -30,6 +30,10 @@ has no tags yet, the version is `0.0.0-ci`.
 
 Between tags, jar names stay fixed, so action-cache digests can match across CI pushes.
 Cutting the next tag starts a new cache generation on purpose.
+
+`version` itself is **not** a cache hit (`Def.uncached`). Git state is still sbt-dynver's last tagged version;
+this plugin only appends `-ci` when `isCleanAfterTag` is false. Compile still reuses `~/.cache/sbt` because the
+*string* stays `0.2.0-ci` until the next tag.
 """,
       exampleValue {
         def format(isCleanAfterTag: Boolean, version: String, suffix: String): String =

@@ -10,7 +10,7 @@ Docs: [early-effect.github.io/sbt-dynver-ci](https://early-effect.github.io/sbt-
 | Any commit after that tag | `0.2.0-ci` |
 | No tags | `0.0.0-ci` |
 
-Between tags, jar names stay stable so sbt 2 action-cache digests (`CompileInputs2`) match across CI pushes. Cutting the next tag intentionally starts a new cache generation.
+Between tags, jar names stay stable so sbt 2 action-cache digests (`CompileInputs2`) match across CI pushes. Cutting the next tag intentionally starts a new cache generation. `version` itself is uncached and re-reads git, so a restored previous-tag action cache cannot republish that tag.
 
 ## Usage
 

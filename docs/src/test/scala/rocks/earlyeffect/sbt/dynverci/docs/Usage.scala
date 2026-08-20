@@ -43,6 +43,10 @@ state appends the configured suffix.
 Give dynver enough history to see tags: set `fetch-depth: 0` (or a depth that includes the
 latest `v*` tags). Publish releases from a clean checkout of a `v*` tag so the Release
 workflow sees the release version rather than the CI suffix.
+
+`version` is uncached so a restored LocalDir cache cannot republish the last tag. Git state
+is still sbt-dynver's: last tagged version, plus `-ci` when `isCleanAfterTag` is false. You
+do not need `cleanFull` on publish to bust a stale version string.
 """
     ),
   )
