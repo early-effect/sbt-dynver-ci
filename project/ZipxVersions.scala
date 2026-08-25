@@ -4,7 +4,7 @@ import zipx.*
   * not a row: generate emits it from the loaded plugin (`zipxSelfPlugins`). Action pins stay on jar defaults.
   */
 object MyVersions extends ZipxVersions:
-  val sbt: SbtVersion     = SbtVersion("2.0.6")
+  val sbt: SbtVersion     = SbtVersion("2.0.7")
   val scala: ScalaVersion = ScalaVersion("3.8.4")
 
   val scalatest = Lib("org.scalatest", "scalatest", "3.2.20").test
