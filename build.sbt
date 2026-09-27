@@ -49,11 +49,12 @@ publishTo := {
 // CI-only publishing: key hex from PGP_KEY_HEX (org secret). Sentinel keeps local loads working.
 usePgpKeyHex(sys.env.getOrElse("PGP_KEY_HEX", "MISSING_KEY_HEX"))
 
-// zipx: Aggregate verify (testFull + scripted) + Central publish + Specular Pages + catalog PRs.
+// zipx: Aggregate verify + Central publish + Specular Pages + catalog PRs.
 // Builtin fmt / workflow-check / advisories stay parallel; do not make test wait on fmt.
+// scripted lives on the plugin project. A build-wide session would send docs/scripted when a
+// pull request only affects docs.
 zipxJavaVersion      := JdkVersion("25")
 zipxWorkflowDispatch := true
-zipxTestTask         := zipxTasks.session(testFull, scripted)
 zipxCapabilities += ZipxCentral.releaseRoot
 zipxCapabilities += ZipxDocs.pages()
 
@@ -63,6 +64,7 @@ lazy val root = project
   .aggregate(docs)
   .settings(MyVersions.pluginTest)
   .settings(
+    zipxTestTask := zipxTasks.session(testFull, scripted),
     name := "sbt-dynver-ci",
     description :=
       "Cache-friendly sbt-dynver policy for CI: stable jar names between tags.",
