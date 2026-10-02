@@ -7,6 +7,8 @@ object MyVersions extends ZipxVersions:
   val sbt: SbtVersion     = SbtVersion("2.1.0-M3")
   val scala: ScalaVersion = ScalaVersion("3.9.0")
 
+  val release = ShipGroup("sbt-dynver-ci", "0.2.4")("root")
+
   val scalatest = Lib("org.scalatest", "scalatest", "3.2.20").test
 
   val specular        = Lib("rocks.earlyeffect", "specular-core", "0.14.1")
@@ -14,7 +16,6 @@ object MyVersions extends ZipxVersions:
   val specularTheme   = specular.mod("early-effect-docs-theme").test
 
   val scalafmt       = Plugin("org.scalameta", "sbt-scalafmt", "2.6.2")
-  val dynver         = Plugin("com.github.sbt", "sbt-dynver", "5.1.1")
   val specularPlugin = Plugin("rocks.earlyeffect", "sbt-specular", "0.14.1")
 
   def pluginTest = library(scalatest)

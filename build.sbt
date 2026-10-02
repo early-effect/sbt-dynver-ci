@@ -5,23 +5,6 @@ organizationName     := "Early Effect"
 organizationHomepage := Some(url("https://www.earlyeffect.rocks"))
 versionScheme        := Some("early-semver")
 
-// Mirror DynverCiPlugin.buildSettings here (stock dynver only in project/). Do not addSbtPlugin
-// this artifact: the meta-build must not depend on a previously published version of itself.
-// Must be ThisBuild-scoped: DynVerPlugin sets ThisBuild / version; a bare `version :=` only
-// overrides the root project and leaves stock dynver (e.g. 0.2.2+3-hash) on ThisBuild — which
-// breaks specularDisplayVersion (and anything else that reads ThisBuild / version).
-def metaCiVersion: String =
-  val suffix = "-ci"
-  sbtdynver.DynVer
-    .getGitDescribeOutput(new java.util.Date)
-    .mkVersion(
-      out => if out.isCleanAfterTag then out.ref.dropPrefix else out.ref.dropPrefix + suffix,
-      "0.0.0" + suffix,
-    )
-
-ThisBuild / version := Def.uncached(metaCiVersion)
-ThisBuild / dynver  := Def.uncached(metaCiVersion)
-
 homepage := Some(url("https://github.com/early-effect/sbt-dynver-ci"))
 licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 scmInfo  := Some(
@@ -55,8 +38,10 @@ usePgpKeyHex(sys.env.getOrElse("PGP_KEY_HEX", "MISSING_KEY_HEX"))
 // pull request only affects docs.
 zipxJavaVersion      := JdkVersion("25")
 zipxWorkflowDispatch := true
-zipxCapabilities += ZipxCentral.releaseRoot
+zipxCapabilities += ZipxCentral.snapshots
+zipxCapabilities += ZipxCentral.pullRequestSnapshots("snapshots")
 zipxCapabilities += ZipxDocs.pages()
+zipxReleaseWorkflow := Some(ZipxCentral.releases)
 
 lazy val root = project
   .in(file("."))
@@ -64,13 +49,14 @@ lazy val root = project
   .aggregate(docs)
   .settings(MyVersions.pluginTest)
   .settings(
+    zipxPublish  := zipxOn,
     zipxTestTask := zipxTasks.session(testFull, scripted),
     name := "sbt-dynver-ci",
     description :=
       "Cache-friendly sbt-dynver policy for CI: stable jar names between tags.",
     scalacOptions ++= Seq("-deprecation", "-feature", "-Wunused:all"),
     // Pull sbt-dynver transitively so consumers need one addSbtPlugin line.
-    addSbtPlugin(MyVersions.moduleID(MyVersions.dynver)),
+    addSbtPlugin("com.github.sbt" % "sbt-dynver" % "5.1.1"),
     scriptedLaunchOpts ++= Seq("-Xmx512m", s"-Dplugin.version=${version.value}"),
     scriptedBufferLog := false,
     publishMavenStyle := true,
