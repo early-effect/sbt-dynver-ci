@@ -43,11 +43,15 @@ zipxCapabilities += ZipxCentral.pullRequestSnapshots("snapshots")
 zipxCapabilities += ZipxDocs.pages()
 zipxReleaseWorkflow := Some(ZipxCentral.releases)
 
-lazy val root = project
+lazy val root: Project = project
   .in(file("."))
   .enablePlugins(SbtPlugin)
   .aggregate(docs)
   .settings(MyVersions.pluginTest)
+  .settings(
+    // docs/compile reads this project's classes (cite). Aggregating compile would cycle.
+    Compile / compile / aggregate := false,
+  )
   .settings(
     zipxPublish  := zipxOn,
     zipxTestTask := zipxTasks.session(testFull, scripted),
@@ -63,9 +67,16 @@ lazy val root = project
     pomIncludeRepository := { _ => false },
   )
 
-lazy val docs = project
+lazy val docs: Project = project
   .in(file("docs"))
   .enablePlugins(SpecularPlugin)
+  // Cite reads DynverCiVersion.format from this build. The published plugin does not depend on docs.
+  // LocalProject, not `root`: root aggregates docs, so a direct reference deadlocks project init.
+  // sbt is provided, so dependsOn alone does not put sbt-dynver on the docs classpath.
+  .dependsOn(LocalProject("root"))
+  .settings(
+    Test / unmanagedClasspath ++= (LocalProject("root") / Compile / dependencyClasspath).value
+  )
   .settings(MyVersions.docsTest)
   .settings(
     name           := "sbt-dynver-ci-docs",
@@ -76,8 +87,13 @@ lazy val docs = project
     specularMetaProject   := Some(LocalProject("root")),
     specularArtifactKind  := "plugin",
     specularSiteDirectory := (LocalRootProject / baseDirectory).value / "target" / "site",
-    // CI docs builds are dynver `-ci`; stripCi drops the suffix so install snippets show the last published tag.
-    specularDisplayVersion := stripCi,
+    // Do not call stripCi. It only drops a trailing -ci, so a `+` build or a SNAPSHOT would
+    // still be advertised, and stripping a next-line -ci would publish that unpublished version.
+    // Any raw version containing -ci, +, or SNAPSHOT advertises the last published tag.
+    specularDisplayVersion := { raw =>
+      val distance = raw.contains("-ci") || raw.contains("+") || raw.contains("SNAPSHOT")
+      if raw.nonEmpty && !distance then raw else "0.2.3"
+    },
   )
 
 addCommandAlias("release", "; publishSigned; sonaRelease")

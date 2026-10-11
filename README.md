@@ -1,22 +1,22 @@
 # sbt-dynver-ci
 
-Cache-friendly [sbt-dynver](https://github.com/sbt/sbt-dynver) policy for early-effect builds.
+Between tags, sbt-dynver-ci keeps one jar name, so an sbt 2 action-cache hit survives the next push.
 
-Docs: [early-effect.github.io/sbt-dynver-ci](https://early-effect.github.io/sbt-dynver-ci/) (after first `v*` Docs deploy).
+Docs: [early-effect.github.io/sbt-dynver-ci](https://early-effect.github.io/sbt-dynver-ci/)
 
 | Git state | Version |
 | --- | --- |
-| Clean on tag `v0.2.0` | `0.2.0` |
-| Any commit after that tag | `0.2.0-ci` |
+| Clean on tag `v0.2.3` | `0.2.3` |
+| Dirty tree, or any commit after that tag | `0.2.3-ci` |
 | No tags | `0.0.0-ci` |
 
-Between tags, jar names stay stable so sbt 2 action-cache digests (`CompileInputs2`) match across CI pushes. Cutting the next tag intentionally starts a new cache generation. `version` itself is uncached and re-reads git, so a restored previous-tag action cache cannot republish that tag.
+Cutting the next tag intentionally starts a new cache generation. `version` itself is uncached and re-reads git, so a restored previous-tag action cache cannot republish that tag.
 
 ## Usage
 
 ```scala
 // project/plugins.sbt
-addSbtPlugin("rocks.earlyeffect" % "sbt-dynver-ci" % "<version>")
+addSbtPlugin("rocks.earlyeffect" % "sbt-dynver-ci" % "0.2.3")
 ```
 
 Do **not** set `version` in `build.sbt`. sbt-dynver is pulled in transitively.

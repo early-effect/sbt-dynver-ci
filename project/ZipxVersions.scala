@@ -11,13 +11,17 @@ object MyVersions extends ZipxVersions:
 
   val scalatest = Lib("org.scalatest", "scalatest", "3.2.20").test
 
-  val specular        = Lib("rocks.earlyeffect", "specular-core", "0.14.1")
+  val specular        = Lib("rocks.earlyeffect", "specular-core", "0.20.0")
   val specularZioTest = specular.mod("specular-zio-test").test
+  val specularSite    = specular.mod("specular-site").test
   val specularTheme   = specular.mod("early-effect-docs-theme").test
 
+  /** Docs figures only. The published plugin does not select this. */
+  val mermoid = Lib("rocks.earlyeffect", "mermoid", "0.2.0")
+
   val scalafmt       = Plugin("org.scalameta", "sbt-scalafmt", "2.6.2")
-  val specularPlugin = Plugin("rocks.earlyeffect", "sbt-specular", "0.14.1")
+  val specularPlugin = Plugin("rocks.earlyeffect", "sbt-specular", "0.20.0")
 
   def pluginTest = library(scalatest)
-  def docsTest   = library(specularZioTest, specularTheme)
+  def docsTest   = library(specular.test, specularZioTest, specularSite, specularTheme, mermoid.test)
 end MyVersions
