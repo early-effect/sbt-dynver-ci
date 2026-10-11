@@ -1,41 +1,46 @@
 package rocks.earlyeffect.sbt.dynverci.docs
 
 import earlyeffect.docs.EarlyEffectTheme
+import specular.DocPage
 import specular.site.*
 import zio.*
 
-import java.nio.file.Path
+import java.nio.file.{Files, Path, StandardCopyOption}
 
-/** Docs-as-tests site builder (Test classpath; `docs/specularSite`). */
+/** Specular DocsSite: Test classpath main invoked by `docs/specularSite`. */
 object BuildSite extends DocsSite:
 
-  def pages = Vector(Overview.doc, Usage.doc)
+  /** Not a nav item. The sidebar is the reference, not a second copy of this page. */
+  private val frontPage: DocPage = Front.doc
 
-  override def site: SiteModel =
-    val m = meta
-    super.site.copy(
-      summaryMarkdown = Some(
-        s"""**sbt-dynver-ci** is a thin sbt-dynver policy for early-effect CI builds.
-On a clean version tag the version is the release itself (`0.2.0`). Everywhere else it is
-`<last-tag>-ci`, so jar names and sbt 2 action-cache digests stay stable across commits
-until the next tag.
-"""
-      ),
-      installSnippets = Vector(
-        ArtifactKind.defaultInstall(m, ArtifactKind.Plugin),
-        CodeSnippet(
-          "Optional suffix",
-          """dynverCiSuffix := "-SNAPSHOT" // default is "-ci"""",
-        ),
-      ),
-      logo = Some(EarlyEffectTheme.logoHref),
-      logoLink = Some("https://www.earlyeffect.rocks/"),
-    )
-  end site
+  private val reference: Vector[DocPage] =
+    Vector(Usage.doc)
+
+  def pages: Vector[DocPage] = frontPage +: reference
+
+  override def site(settings: DocsSettings): SiteModel =
+    EarlyEffectTheme
+      .brand(super.site(settings))
+      .copy(
+        nav = Some(NavModel.flat(reference)),
+        summaryMarkdown = None,
+      )
 
   override def layers: ZLayer[Any, Nothing, SiteBuilder] =
     EarlyEffectTheme.layers
 
-  override def afterBuild(out: Path, result: SiteOutput): Task[Unit] =
-    EarlyEffectTheme.writeLogo(out)
+  override def afterBuild(out: Path, result: SiteOutput): IO[SiteError, Unit] =
+    val _ = result
+    // Specular still writes index.html as a summary plus a second copy of the nav.
+    // The front DocPage is the index. Copy it over that file. Asset paths stay site-relative.
+    val front   = out.resolve(s"${frontPage.slug}.html")
+    val index   = out.resolve("index.html")
+    val promote =
+      ZIO
+        .attemptBlockingIO(Files.copy(front, index, StandardCopyOption.REPLACE_EXISTING))
+        .mapError { err =>
+          SiteError.WriteFailed(index, err)
+        }
+    promote *> EarlyEffectTheme.writeLogo(out)
+  end afterBuild
 end BuildSite
