@@ -87,12 +87,17 @@ lazy val docs: Project = project
     specularMetaProject   := Some(LocalProject("root")),
     specularArtifactKind  := "plugin",
     specularSiteDirectory := (LocalRootProject / baseDirectory).value / "target" / "site",
-    // Do not call stripCi. It only drops a trailing -ci, so a `+` build or a SNAPSHOT would
-    // still be advertised, and stripping a next-line -ci would publish that unpublished version.
-    // Any raw version containing -ci, +, or SNAPSHOT advertises the last published tag.
+    // The docs workflow sets SPECULAR_STRIP_CI, which ignores this setting and only
+    // strips a trailing -ci. 0.2.4-ci would become 0.2.4, which is not on Central.
+    // The forked builder reads -Dspecular.meta.displayVersion, pinned below.
     specularDisplayVersion := { raw =>
-      val distance = raw.contains("-ci") || raw.contains("+") || raw.contains("SNAPSHOT")
-      if raw.nonEmpty && !distance then raw else "0.2.3"
+      val published = "0.2.3"
+      if raw.trim == published then published else published
+    },
+    specularMetaProps := Def.uncached {
+      val published = specularDisplayVersion.value("")
+      val pinned    = s"-Dspecular.meta.displayVersion=$published"
+      specularMetaProps.value.filterNot(_.startsWith("-Dspecular.meta.displayVersion=")) :+ pinned
     },
   )
 
